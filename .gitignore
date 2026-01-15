@@ -41,3 +41,11 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Temporary files and logs
+lint_results.txt
+lint_summary.txt
+full_lint_report.txt
+inspect_db.js
+test_status.js
+*.sql

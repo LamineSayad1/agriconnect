@@ -12,7 +12,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -151,7 +151,7 @@ export default function Signup() {
             </View>
 
             <View className="px-8 pb-12">
-              <View className="mt-8 mb-8">
+              <View className="mt-6 mb-8">
                 <Text className="text-gray-900 text-3xl font-bold tracking-tight mb-2">
                   Create Account
                 </Text>

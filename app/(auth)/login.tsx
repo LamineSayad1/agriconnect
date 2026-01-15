@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -196,8 +197,12 @@ export default function EntryScreen() {
 
               {/* Brand Header */}
               <View className="items-center mb-12">
-                <View className="bg-green-600 p-5 rounded-3xl mb-6 shadow-xl rotation-3">
-                  <Ionicons name="leaf" size={42} color="white" />
+                <View className="bg-green-600 p-5 rounded-3xl mb-6 shadow-xl">
+                  <Image
+                    source={require('@/assets/images/logo-icon.png')}
+                    style={{ width: 60, height: 60, tintColor: 'white' }}
+                    resizeMode="contain"
+                  />
                 </View>
                 <Text className="text-gray-900 text-4xl font-extrabold tracking-tight mb-2">
                   AgriConnect

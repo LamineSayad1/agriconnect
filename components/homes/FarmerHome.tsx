@@ -156,7 +156,7 @@ export default function FarmerHome() {
         const product = Array.isArray(item.product) ? item.product[0] : item.product;
 
         return {
-          id: order?.id || item.id,
+          id: item.id, // Use unique order_item ID instead of order.id
           productId: product?.id,
           product: product?.name || 'Unknown Product',
           imageUrl: product?.image_url,

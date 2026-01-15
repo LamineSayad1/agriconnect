@@ -8,7 +8,7 @@ export default function Index() {
     useEffect(() => {
         // Use a timeout to ensure the navigation tree is mounted
         const timer = setTimeout(() => {
-            router.replace("/(auth)/login");
+            router.replace("/launch");
         }, 0);
         return () => clearTimeout(timer);
     }, []);

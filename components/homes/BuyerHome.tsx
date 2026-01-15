@@ -132,7 +132,7 @@ export default function BuyerHome() {
 
           <View className="flex-row items-center gap-3">
             <TouchableOpacity
-              onPress={() => router.push("/(tabs)/orders" as any)}
+              onPress={() => router.push("/cart" as any)}
               className="bg-white/20 w-12 h-12 rounded-2xl items-center justify-center border border-white/10"
             >
               <View className="relative">

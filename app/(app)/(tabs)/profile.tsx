@@ -1,10 +1,11 @@
 import { supabase } from '@/lib/supabaseClient';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Linking, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Profile() {
@@ -12,6 +13,8 @@ export default function Profile() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     full_name: "",
     farm_name: "",
@@ -30,6 +33,7 @@ export default function Profile() {
           .single();
 
         setUser({ ...user, ...profile });
+        setAvatar(profile?.avatar_url || null);
         setFormData({
           full_name: profile?.full_name || "",
           farm_name: profile?.farm_name || "",
@@ -79,6 +83,81 @@ export default function Profile() {
       await AsyncStorage.removeItem('user_session');
     } catch {
       (router as any).replace("/");
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        Alert.alert(
+          "Permission Required",
+          "Please allow access to your photo gallery to upload a profile picture.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Open Settings", onPress: () => Linking.openSettings() }
+          ]
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        await uploadAvatar(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Image picker error:', error);
+      Alert.alert("Error", "Failed to open image picker");
+    }
+  };
+
+  const uploadAvatar = async (uri: string) => {
+    if (!user) return;
+
+    setUploadingAvatar(true);
+    try {
+      const ext = uri.split(".").pop()?.toLowerCase() || "jpeg";
+      const filePath = `${user.id}/avatar.${ext}`;
+
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const arrayBuffer = await new Response(blob).arrayBuffer();
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, arrayBuffer, {
+          contentType: blob.type || "image/jpeg",
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatar(publicUrl);
+      Alert.alert("Success", "Profile picture updated!");
+      getCurrentUser();
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      Alert.alert("Upload Failed", error?.message || "Failed to upload profile picture");
+    } finally {
+      setUploadingAvatar(false);
     }
   };
 
@@ -143,27 +222,48 @@ export default function Profile() {
 
         <View className="px-6 w-full flex-row justify-between items-center z-10 mb-6">
           <Text className="text-3xl font-black text-gray-900 tracking-tighter">My Account</Text>
-          <TouchableOpacity
-            onPress={handleLogout}
-            className="bg-red-50 p-2.5 rounded-2xl border border-red-100 shadow-sm"
-          >
-            <Ionicons name="log-out-outline" size={24} color="#ef4444" />
-          </TouchableOpacity>
+          <View className="flex-row gap-3">
+            <TouchableOpacity
+              onPress={() => setEditing(!editing)}
+              className={`${editing ? 'bg-orange-50 border-orange-200' : 'bg-gray-50 border-gray-100'} p-2.5 rounded-2xl border shadow-sm`}
+            >
+              <Ionicons name={editing ? "close" : "create-outline"} size={24} color={editing ? "#ea580c" : "#6b7280"} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleLogout}
+              className="bg-red-50 p-2.5 rounded-2xl border border-red-100 shadow-sm"
+            >
+              <Ionicons name="log-out-outline" size={24} color="#ef4444" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Profile Identity */}
         <View className="items-center z-10 w-full mb-2">
           <View className="relative mb-4">
             <View className={`w-32 h-32 ${themeLightBg} rounded-[48px] items-center justify-center border-4 border-white shadow-xl overflow-hidden`}>
-              <Text className="text-6xl">
-                {isBuyer ? '🧑‍💻' : isFarmer ? '👨‍🌾' : '🚚'}
-              </Text>
+              {avatar ? (
+                <Image
+                  source={{ uri: avatar }}
+                  className="w-full h-full"
+                  resizeMode="cover"
+                />
+              ) : (
+                <Text className="text-6xl">
+                  {isBuyer ? '🧑‍💻' : isFarmer ? '👨‍🌾' : '🚚'}
+                </Text>
+              )}
             </View>
             <TouchableOpacity
-              onPress={() => setEditing(!editing)}
+              onPress={pickImage}
+              disabled={uploadingAvatar}
               style={{ position: 'absolute', bottom: -4, right: -4, backgroundColor: themeColor, padding: 12, borderRadius: 16, borderWidth: 4, borderColor: 'white', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 5 }}
             >
-              <Ionicons name={editing ? "close" : "camera-outline"} size={20} color="white" />
+              {uploadingAvatar ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Ionicons name="camera-outline" size={20} color="white" />
+              )}
             </TouchableOpacity>
           </View>
 

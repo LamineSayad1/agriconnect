@@ -15,7 +15,7 @@ import {
 export default function SupplierHome() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-  const [stats, setStats] = useState({ totalSales: 0, activeSupplies: 0 });
+  const [stats, setStats] = useState({ totalSales: 0, activeSupplies: 0, inventoryValue: 0 });
   const [supplies, setSupplies] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -28,7 +28,14 @@ export default function SupplierHome() {
 
     const { data: suppliesData } = await supabase.from('supplies').select('*').eq('supplier_id', user.id);
     setSupplies(suppliesData || []);
-    setStats(prev => ({ ...prev, activeSupplies: suppliesData?.length || 0 }));
+
+    const inventoryValue = suppliesData?.reduce((acc, item) => acc + (item.price * (item.stock || 0)), 0) || 0;
+
+    setStats(prev => ({
+      ...prev,
+      activeSupplies: suppliesData?.length || 0,
+      inventoryValue
+    }));
   }, [router]);
 
   useEffect(() => {
@@ -78,7 +85,9 @@ export default function SupplierHome() {
         <View className="bg-blue-800/20 p-6 rounded-[24px] border border-white/10 flex-row justify-between items-center shadow-inner">
           <View>
             <Text className="text-blue-100 text-[10px] font-black uppercase tracking-widest mb-1">Inventory Value</Text>
-            <Text className="text-white text-4xl font-black tracking-tighter">$12,450</Text>
+            <Text className="text-white text-4xl font-black tracking-tighter">
+              ${stats.inventoryValue.toLocaleString()}
+            </Text>
           </View>
           <View className="w-14 h-14 bg-white/20 rounded-2xl items-center justify-center">
             <Ionicons name="wallet-outline" size={24} color="white" />

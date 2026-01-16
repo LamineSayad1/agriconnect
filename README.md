@@ -90,7 +90,15 @@ The project uses **Supabase** (PostgreSQL). Key tables include:
 - `orders`: Transaction records.
 - `order_items`: Specific items within an order.
 
-Schema initialization scripts can be found in the root or `database/` folder (e.g., `supabase_schema.sql`).
+### Setup
+
+1. **Create a Supabase Project:** Go to [database.new](https://database.new) and create a new project.
+2. **Database Schema:** Run the SQL scripts located in the `database/` folder in your Supabase SQL Editor.
+   - Start with `supabase_schema.sql` to set up tables and security policies.
+   - (Optional) Run `seed_data.sql` to populate with test data.
+3. **Environment Variables:**
+   - Copy `.env.example` to `.env`.
+   - Fill in `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` from your Supabase project settings.
 
 ## 🤝 Contributing
 

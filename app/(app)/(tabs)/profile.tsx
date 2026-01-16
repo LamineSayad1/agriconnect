@@ -17,9 +17,7 @@ export default function Profile() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     full_name: "",
-    farm_name: "",
-    phone: "",
-    address: "",
+    farm_description: "",
   });
 
   const getCurrentUser = useCallback(async () => {
@@ -36,9 +34,7 @@ export default function Profile() {
         setAvatar(profile?.avatar_url || null);
         setFormData({
           full_name: profile?.full_name || "",
-          farm_name: profile?.farm_name || "",
-          phone: profile?.phone || "",
-          address: profile?.address || "",
+          farm_description: profile?.farm_description || "",
         });
       }
     } catch (error) {
@@ -225,13 +221,15 @@ export default function Profile() {
           <View className="flex-row gap-3">
             <TouchableOpacity
               onPress={() => setEditing(!editing)}
-              className={`${editing ? 'bg-orange-50 border-orange-200' : 'bg-gray-50 border-gray-100'} p-2.5 rounded-2xl border shadow-sm`}
+              style={[{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 }]}
+              className={`${editing ? 'bg-orange-50 border-orange-200' : 'bg-gray-50 border-gray-100'} p-2.5 rounded-2xl border`}
             >
               <Ionicons name={editing ? "close" : "create-outline"} size={24} color={editing ? "#ea580c" : "#6b7280"} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleLogout}
-              className="bg-red-50 p-2.5 rounded-2xl border border-red-100 shadow-sm"
+              style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 }}
+              className="bg-red-50 p-2.5 rounded-2xl border border-red-100"
             >
               <Ionicons name="log-out-outline" size={24} color="#ef4444" />
             </TouchableOpacity>
@@ -241,7 +239,9 @@ export default function Profile() {
         {/* Profile Identity */}
         <View className="items-center z-10 w-full mb-2">
           <View className="relative mb-4">
-            <View className={`w-32 h-32 ${themeLightBg} rounded-[48px] items-center justify-center border-4 border-white shadow-xl overflow-hidden`}>
+            <View
+              style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}
+              className={`w-32 h-32 ${themeLightBg} rounded-[48px] items-center justify-center border-4 border-white overflow-hidden`}>
               {avatar ? (
                 <Image
                   source={{ uri: avatar }}
@@ -274,9 +274,9 @@ export default function Profile() {
             </Text>
           </View>
 
-          {user?.farm_name && (
-            <Text className="text-gray-400 font-bold mt-2 text-center text-sm">
-              <Ionicons name="location-outline" size={12} color="#9ca3af" /> {user.farm_name}
+          {user?.farm_description && (
+            <Text className="text-gray-400 font-bold mt-2 text-center text-sm px-4" numberOfLines={2}>
+              {user.farm_description}
             </Text>
           )}
         </View>
@@ -300,7 +300,7 @@ export default function Profile() {
             contentContainerStyle={{ paddingHorizontal: 24 }}
           >
             {profileStats.map((stat, index) => (
-              <View key={index} className="bg-white rounded-[32px] p-5 mr-4 w-40 border border-gray-100 shadow-sm">
+              <View key={index} style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 }} className="bg-white rounded-[32px] p-5 mr-4 w-40 border border-gray-100">
                 <View className={`w-10 h-10 ${themeLightBg} rounded-2xl items-center justify-center mb-3`}>
                   <Ionicons name={stat.icon as any} size={20} color={themeColor} />
                 </View>
@@ -323,10 +323,13 @@ export default function Profile() {
             )}
           </View>
 
-          <View className="bg-white rounded-[40px] p-8 shadow-sm border border-gray-100">
+          <View style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 }} className="bg-white rounded-[40px] p-8 border border-gray-100">
             <View className="mb-6">
               <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3 ml-1">Full Identity</Text>
-              <View className={`flex-row items-center px-4 rounded-3xl ${editing ? 'bg-white border-2 border-green-500 shadow-sm' : 'bg-gray-50'}`}>
+              <View
+                style={editing ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 } : undefined}
+                className={`flex-row items-center px-4 rounded-3xl ${editing ? 'bg-white border-2 border-green-500' : 'bg-gray-50'}`}
+              >
                 <Ionicons name="person-outline" size={20} color={editing ? themeColor : "#9ca3af"} />
                 <TextInput
                   value={formData.full_name}
@@ -340,54 +343,29 @@ export default function Profile() {
 
             {(isFarmer || isSupplier) && (
               <View className="mb-6">
-                <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3 ml-1">{isFarmer ? "Farm Name" : "Business Name"}</Text>
-                <View className={`flex-row items-center px-4 rounded-3xl ${editing ? 'bg-white border-2 border-green-500 shadow-sm' : 'bg-gray-50'}`}>
-                  <Ionicons name="business-outline" size={20} color={editing ? themeColor : "#9ca3af"} />
+                <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3 ml-1">Farm Description</Text>
+                <View
+                  style={editing ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 2 } : undefined}
+                  className={`flex-row items-start px-4 rounded-3xl pt-4 ${editing ? 'bg-white border-2 border-green-500' : 'bg-gray-50'}`}
+                >
+                  <Ionicons name="leaf-outline" size={20} color={editing ? themeColor : "#9ca3af"} />
                   <TextInput
-                    value={formData.farm_name}
-                    onChangeText={(text) => setFormData({ ...formData, farm_name: text })}
+                    value={formData.farm_description}
+                    onChangeText={(text) => setFormData({ ...formData, farm_description: text })}
                     editable={editing}
-                    placeholder="Enter name"
-                    className="flex-1 py-4 ml-3 font-bold text-gray-900"
+                    multiline
+                    placeholder="Describe your farm"
+                    className="flex-1 pb-4 ml-3 font-bold text-gray-900 min-h-[100px]"
+                    style={{ textAlignVertical: 'top' }}
                   />
                 </View>
               </View>
             )}
 
-            <View className="mb-6">
-              <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3 ml-1">Contact Phone</Text>
-              <View className={`flex-row items-center px-4 rounded-3xl ${editing ? 'bg-white border-2 border-green-500 shadow-sm' : 'bg-gray-50'}`}>
-                <Ionicons name="call-outline" size={20} color={editing ? themeColor : "#9ca3af"} />
-                <TextInput
-                  value={formData.phone}
-                  onChangeText={(text) => setFormData({ ...formData, phone: text })}
-                  editable={editing}
-                  keyboardType="phone-pad"
-                  placeholder="Add phone number"
-                  className="flex-1 py-4 ml-3 font-bold text-gray-900"
-                />
-              </View>
-            </View>
-
-            <View className="mb-2">
-              <Text className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3 ml-1">Location / Address</Text>
-              <View className={`flex-row items-start px-4 rounded-3xl pt-4 ${editing ? 'bg-white border-2 border-green-500 shadow-sm' : 'bg-gray-50'}`}>
-                <Ionicons name="map-outline" size={20} color={editing ? themeColor : "#9ca3af"} />
-                <TextInput
-                  value={formData.address}
-                  onChangeText={(text) => setFormData({ ...formData, address: text })}
-                  editable={editing}
-                  multiline
-                  placeholder="Enter your address"
-                  className="flex-1 pb-4 ml-3 font-bold text-gray-900 min-h-[100px]"
-                  style={{ textAlignVertical: 'top' }}
-                />
-              </View>
-            </View>
-
             {editing && (
               <TouchableOpacity
-                className={`${themeBg} rounded-3xl py-5 mt-4 shadow-xl active:scale-[0.98]`}
+                style={[{ shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }]}
+                className={`${themeBg} rounded-3xl py-5 mt-4 active:scale-[0.98]`}
                 onPress={handleUpdateProfile}
               >
                 <Text className="text-white text-center font-black text-lg uppercase tracking-widest">Update Profile</Text>

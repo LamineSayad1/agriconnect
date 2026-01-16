@@ -31,7 +31,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [phone, setPhone] = useState("");
+
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -63,9 +63,7 @@ export default function Signup() {
 
     if (password !== confirmPassword) return { valid: false, error: "Passwords do not match" };
 
-    const p = phone.trim();
-    if (!p) return { valid: false, error: "Please enter your phone number" };
-    if (p.length < 8) return { valid: false, error: "Please enter a valid phone number" };
+
 
     return { valid: true };
   };
@@ -86,7 +84,6 @@ export default function Signup() {
           data: {
             full_name: fullName.trim(),
             role: role,
-            phone: phone.trim(),
           }
         }
       });
@@ -220,19 +217,7 @@ export default function Signup() {
                     />
                   </View>
 
-                  {/* Phone */}
-                  <View className="bg-gray-50/60 rounded-2xl flex-row items-center px-4 border border-gray-200">
-                    <Ionicons name="call-outline" size={20} color="#6b7280" />
-                    <TextInput
-                      placeholder="Phone Number"
-                      placeholderTextColor="#9ca3af"
-                      className="flex-1 py-4 px-3 text-gray-900 font-semibold"
-                      value={phone}
-                      onChangeText={setPhone}
-                      keyboardType="phone-pad"
-                      editable={!loading}
-                    />
-                  </View>
+
 
                   {/* Password */}
                   <View className="bg-gray-50/60 rounded-2xl flex-row items-center px-4 border border-gray-200">
